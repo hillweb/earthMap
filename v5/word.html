@@ -1,175 +1,160 @@
-<!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="utf-8">
-		<title></title>
-		<style>
-			body {
-				display: flex;
-				justify-content: center;
-			}
+<div id="chartdiv"></div>
+<script src="index.js"></script>
+<script src="map.js"></script>
+<script src="worldLow.js"></script>
+<script src="Animated.js"></script>
+<script src="exporting.js"></script>
+<script src="cn_ZH.js"></script>
+<style>
+	body {
+		display: flex;
+		justify-content: center;
+	}
 
-			#chartdiv {
-				flex: 1;
-				width: 90vw;
-				max-width: 90vw;
-				height: 90dvh
-			}
-		</style>
-		<script src="index.js"></script>
-		<script src="map.js"></script>
-		<script src="worldLow.js"></script>
-		<script src="Animated.js"></script>
-		<script src="exporting.js"></script>
-		<script src="cn_ZH.js"></script>
-		
-	</head>
-	<body>
-		<!-- HTML -->
-		<div id="chartdiv"></div>
-		<!-- Chart code -->
-		<script>
-			am5.ready(function() {
-				// Create root and chart
-				var root = am5.Root.new('chartdiv');
-				// Set themes
-			root.setThemes([
-			  am5themes_Animated.new(root)
-			]);
-			
-				var chart = root.container.children.push(am5map.MapChart.new(root, {
-					panX: 'rotateX',
-					panY: 'none',
-					zoomLevel: 1,
-					wheelY: 'none',
-					paddingBottom: 20,
-					paddingTop: 20,
-					paddingLeft: 20,
-					paddingRight: 20,
-					// zoomStep:1,
-					// homeRotationX:0,
-					// homeRotationY:0,
-					// homeZoomLevel:1,
-					// homeGeoPoint:{longitude:0,latitude: 0},
-					projection: am5map.geoNaturalEarth1()
-				}));
-				// Create polygon series
-				var polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
-					geoJSON: am5geodata_worldLow,
-					geodataNames: am5geodata_lang_cn_ZH
-					
-				}));
-				polygonSeries.mapPolygons.template.setAll({
-					tooltipText: '{name}',
-					toggleKey: 'active',
-					interactive: true
-				});
-				polygonSeries.mapPolygons.template.states.create('hover', {
-					fill: root.interfaceColors.get('primaryButtonHover')
-				});
-				polygonSeries.mapPolygons.template.states.create('active', {
-					fill: root.interfaceColors.get('primaryButtonHover')
-				});
-				var graticuleSeries = chart.series.insertIndex(0, am5map.GraticuleSeries.new(root, { step: 15 }));
-				graticuleSeries.mapLines.template.setAll({
-					stroke: am5.color(0x000000),
-					strokeOpacity: 0.1
-				});
-				// === 特别高亮 0° 经线（本初子午线，伦敦格林威治那条）===
-				// var primeMeridianSeries = chart.series.push(am5map.GraticuleSeries.new(root, {
-				// 	step: 360, // 只会画一条
-				// 	longitude: 0 // 强制画在 0° 经度
-				// }));
-				// primeMeridianSeries.mapLines.template.setAll({
-				// 	stroke: am5.color('#ffcd00'), // 金色，和中国高亮同色
-				// 	strokeWidth: 1,
-				// 	strokeOpacity: 0.9
-				// });
-				var backgroundSeries = chart.series.unshift(am5map.MapPolygonSeries.new(root, {}));
-				backgroundSeries.mapPolygons.template.setAll({
-					fill: am5.color(0xedf7fa),
-					stroke: am5.color(0xedf7fa),
-				});
-				backgroundSeries.data.push({
-					geometry: am5map.getGeoRectangle(90, 180, -90, -180)
-				});
-				// Add projection buttons
-				var buttons = chart.children.push(am5.Container.new(root, {
-					x: am5.p50,
-					centerX: am5.p50,
-					y: am5.p100,
-					dy: -10,
-					centerY: am5.p100,
-					layout: root.horizontalLayout,
-					paddingTop: 5,
-					paddingRight: 8,
-					paddingBottom: 5,
-					paddingLeft: 8,
-					background: am5.RoundedRectangle.new(root, {
-						fill: am5.color('#fff'),
-						fillOpacity: 0.3
-					})
-				}));
-				var rotationY = 0;
-				var lastprojection = 'geoNaturalEarth1';
+	#chartdiv {
+		flex: 1;
+	}
+</style>
+<script>
+	am5.ready(function () {
+		// Create root and chart
+		var root = am5.Root.new('chartdiv');
+		// Set themes
+		root.setThemes([
+			am5themes_Animated.new(root)
+		]);
 
-				function createButton(text, projection) {
-					var button = buttons.children.push(am5.Button.new(root, {
-						paddingTop: 0,
-						paddingRight: 0,
-						paddingBottom: 0,
-						paddingLeft: 0,
-						marginLeft: 5,
-						marginRight: 5,
-						label: am5.Label.new(root, {
-							text: text,
-						})
-					}));
-					button.events.on('click', function() {
-						chart.set('projection', projection);
-						let Y = 0;
-						if (text == 'geoOrthographic') {
-							chart.set('panY', 'rotateY');
-							Y = rotationY;
-						} else {
-							if (lastprojection == 'geoOrthographic') {
-								chart.set('panY', 'none');
-								rotationY = chart.get('rotationY');
-							};
-							Y = 0;
-						}
-						chart.animate({
-							key: 'rotationY',
-							to: Y,
-							duration: 500,
-							easing: am5.ease.inOut(am5.ease.cubic)
-						});
-						lastprojection = text;
-					});
+		var chart = root.container.children.push(am5map.MapChart.new(root, {
+			panX: 'rotateX',
+			panY: 'none',
+			zoomLevel: 1,
+			wheelY: 'none',
+			paddingBottom: 20,
+			paddingTop: 20,
+			paddingLeft: 20,
+			paddingRight: 20,
+			// zoomStep:1,
+			// homeRotationX:0,
+			// homeRotationY:0,
+			// homeZoomLevel:1,
+			// homeGeoPoint:{longitude:0,latitude: 0},
+			projection: am5map.geoNaturalEarth1()
+		}));
+		// Create polygon series
+		var polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
+			geoJSON: am5geodata_worldLow,
+			geodataNames: am5geodata_lang_cn_ZH
+
+		}));
+		polygonSeries.mapPolygons.template.setAll({
+			tooltipText: '{name}',
+			toggleKey: 'active',
+			interactive: true
+		});
+		polygonSeries.mapPolygons.template.states.create('hover', {
+			fill: root.interfaceColors.get('primaryButtonHover')
+		});
+		polygonSeries.mapPolygons.template.states.create('active', {
+			fill: root.interfaceColors.get('primaryButtonHover')
+		});
+		var graticuleSeries = chart.series.insertIndex(0, am5map.GraticuleSeries.new(root, { step: 15 }));
+		graticuleSeries.mapLines.template.setAll({
+			stroke: am5.color(0x000000),
+			strokeOpacity: 0.1
+		});
+		// === 特别高亮 0° 经线（本初子午线，伦敦格林威治那条）===
+		// var primeMeridianSeries = chart.series.push(am5map.GraticuleSeries.new(root, {
+		// 	step: 360, // 只会画一条
+		// 	longitude: 0 // 强制画在 0° 经度
+		// }));
+		// primeMeridianSeries.mapLines.template.setAll({
+		// 	stroke: am5.color('#ffcd00'), // 金色，和中国高亮同色
+		// 	strokeWidth: 1,
+		// 	strokeOpacity: 0.9
+		// });
+		var backgroundSeries = chart.series.unshift(am5map.MapPolygonSeries.new(root, {}));
+		backgroundSeries.mapPolygons.template.setAll({
+			fill: am5.color(0xedf7fa),
+			stroke: am5.color(0xedf7fa),
+		});
+		backgroundSeries.data.push({
+			geometry: am5map.getGeoRectangle(90, 180, -90, -180)
+		});
+		// Add projection buttons
+		var buttons = chart.children.push(am5.Container.new(root, {
+			x: am5.p50,
+			centerX: am5.p50,
+			y: am5.p100,
+			dy: -10,
+			centerY: am5.p100,
+			layout: root.horizontalLayout,
+			paddingTop: 5,
+			paddingRight: 8,
+			paddingBottom: 5,
+			paddingLeft: 8,
+			background: am5.RoundedRectangle.new(root, {
+				fill: am5.color('#fff'),
+				fillOpacity: 0.3
+			})
+		}));
+		var rotationY = 0;
+		var lastprojection = 'geoNaturalEarth1';
+
+		function createButton(text, projection) {
+			var button = buttons.children.push(am5.Button.new(root, {
+				paddingTop: 0,
+				paddingRight: 0,
+				paddingBottom: 0,
+				paddingLeft: 0,
+				marginLeft: 5,
+				marginRight: 5,
+				label: am5.Label.new(root, {
+					text: text,
+				})
+			}));
+			button.events.on('click', function () {
+				chart.set('projection', projection);
+				let Y = 0;
+				if (text == 'geoOrthographic') {
+					chart.set('panY', 'rotateY');
+					Y = rotationY;
+				} else {
+					if (lastprojection == 'geoOrthographic') {
+						chart.set('panY', 'none');
+						rotationY = chart.get('rotationY');
+					};
+					Y = 0;
 				}
-				createButton('geoEqualEarth', am5map.geoEqualEarth());
-				createButton('geoEquirectangular', am5map.geoEquirectangular());
-				createButton('geoMercator', am5map.geoMercator());
-				createButton('geoNaturalEarth1', am5map.geoNaturalEarth1());
-				createButton('geoOrthographic', am5map.geoOrthographic());
-				chart.appear(1000, 100);
-				// 设置导出图像
-				var exporting = am5plugins_exporting.Exporting.new(root, {
-					menu: am5plugins_exporting.ExportingMenu.new(root, {})
+				chart.animate({
+					key: 'rotationY',
+					to: Y,
+					duration: 500,
+					easing: am5.ease.inOut(am5.ease.cubic)
 				});
-				//导出图像时暂时修改图像尺寸；导出后恢复
-				exporting.events.on('exportstarted', function () {
-					root.dom.style.width = '600px';
-					root.dom.style.height = '600px';
-					root.resize();
-				});
-				exporting.events.on('exportfinished', function () {
-					root.dom.style.width = '';
-					root.dom.style.height = '';
-					root.resize();
-				});
-				
-			}); // end am5.ready()
-		</script>
-	</body>
-</html>
+				lastprojection = text;
+			});
+		}
+		createButton('geoEqualEarth', am5map.geoEqualEarth());
+		createButton('geoEquirectangular', am5map.geoEquirectangular());
+		createButton('geoMercator', am5map.geoMercator());
+		createButton('geoNaturalEarth1', am5map.geoNaturalEarth1());
+		createButton('geoOrthographic', am5map.geoOrthographic());
+		chart.appear(1000, 100);
+		// 设置导出图像
+		var exporting = am5plugins_exporting.Exporting.new(root, {
+			menu: am5plugins_exporting.ExportingMenu.new(root, {})
+		});
+		//导出图像时暂时修改图像尺寸；导出后恢复
+		exporting.events.on('exportstarted', function () {
+			root.dom.style.width = '600px';
+			root.dom.style.height = '600px';
+			root.resize();
+		});
+		exporting.events.on('exportfinished', function () {
+			root.dom.style.width = '';
+			root.dom.style.height = '';
+			root.resize();
+		});
+
+	}); // end am5.ready()
+</script>
