@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<style>
+			#main {
+				width: calc(100svw - 20px);
+				height: calc(100svh - 20px);
+				display: flex;
+			}
+
+			.menu {
+				background-color: #2c3e50;
+				flex: 0 0 300px;
+				color: #ecf0f1;
+				font-family: 'Arial', sans-serif;
+				box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+				overflow-y: auto;
+			}
+
+			.menu-title {
+				margin-bottom: 20px;
+			}
+
+			.menu-title .title {
+				font-size: 16px;
+				font-weight: bold;
+				padding: 15px 20px 10px;
+				color: #3498db;
+				text-transform: uppercase;
+				letter-spacing: 1px;
+			}
+
+			.menu-title ul {
+				list-style: none;
+				padding: 0;
+				margin: 0;
+			}
+
+			.menu-title li {
+				padding: 10px 20px;
+				cursor: pointer;
+				transition: all 0.3s ease;
+				border-left: 3px solid transparent;
+			}
+
+			.menu-title li:hover {
+				background-color: rgba(255, 255, 255, 0.1);
+				border-left-color: #3498db;
+				padding-left: 25px;
+			}
+
+			.menu-title li:active {
+				background-color: rgba(255, 255, 255, 0.2);
+			}
+
+			.menu-title li.active {
+				background-color: rgba(52, 152, 219, 0.2);
+				border-left-color: #3498db;
+				font-weight: bold;
+			}
+
+			/* 滚动条样式 */
+			.menu::-webkit-scrollbar {
+				width: 6px;
+			}
+
+			.menu::-webkit-scrollbar-track {
+				background: rgba(255, 255, 255, 0.1);
+			}
+
+			.menu::-webkit-scrollbar-thumb {
+				background: rgba(52, 152, 219, 0.5);
+				border-radius: 3px;
+			}
+
+			.menu::-webkit-scrollbar-thumb:hover {
+				background: rgba(52, 152, 219, 0.8);
+			}
+
+			.mapframe {
+				flex: 1;
+			}
+
+			.title {
+				height: 32px;
+				display: flex;
+				align-items: center;
+			}
+
+			.menu-title>ul {
+				padding-left: 30px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div id="main">
+			<div class="menu">
+				<div class="menu-title">
+					<div class="title">
+						<img src="e.svg" height="32" width="32"><span style="font-size: 14px;">V4版本[可导出SVG]</span>
+					</div>
+					<ul>
+						<li class="active" onclick="changeMap('v4/index.html')">地球仪</li>
+					</ul>
+				</div>
+				<div class="menu-title">
+					<div class="title">
+						<img src="e.svg" height="32" width="32"><span style="font-size: 14px;">V5版本</span>
+					</div>
+					<ul>
+						<li onclick="changeMap('v5/globe-earth.html')">地球仪[单选]</li>
+						<li onclick="changeMap('v5/earth.html')">地球仪[多选]</li>
+						<li onclick="changeMap('v5/word.html')">世界地图[多模式]</li>
+						<li onclick="changeMap('v5/word-view.html')">世界地图[多模式]</li>
+						<li onclick="changeMap('v5/word-1.html')">世界地图-geoNaturalEarth1</li>
+						<li onclick="changeMap('v5/word-2.html')">世界地图-geoEqualEarth</li>
+						<li onclick="changeMap('v5/word-3.html')">世界地图-geoEquirectangular</li>
+						<li onclick="changeMap('v5/word-4.html')">世界地图-geoMercator</li>
+						<li onclick="changeMap('v5/word-5.html')">世界地图-geoOrthographic</li>
+					</ul>
+				</div>
+			</div>
+			<iframe class="mapframe" id='mapframe' src="./v4/index.html" frameborder="0"></iframe>
+		</div>
+		<script>
+			function changeMap(version) {
+				// 移除所有li元素的active类
+				var allLi = document.querySelectorAll('.menu-title li');
+				allLi.forEach(function (li) {
+					li.classList.remove('active');
+				});
+
+				// 为当前点击的li元素添加active类
+				event.currentTarget.classList.add('active');
+
+				// 更新iframe的src
+				document.getElementById('mapframe').src = version;
+			}
+		</script>
+	</body>
+
+</html>
