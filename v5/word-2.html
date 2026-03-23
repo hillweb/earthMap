@@ -1,0 +1,101 @@
+<div id="chartdiv"></div>
+<script src="index.js"></script>
+<script src="map.js"></script>
+<script src="worldLow.js"></script>
+<script src="Animated.js"></script>
+<script src="exporting.js"></script>
+<script src="cn_ZH.js"></script>
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+    }
+
+    #chartdiv {
+        flex: 1;
+    }
+</style>
+<script>
+    am5.ready(function () {
+        // Create root and chart
+        var root = am5.Root.new('chartdiv');
+        // Set themes
+        root.setThemes([
+            am5themes_Animated.new(root)
+        ]);
+
+        var chart = root.container.children.push(am5map.MapChart.new(root, {
+            panX: 'rotateX',
+            panY: 'none',
+            zoomLevel: 1,
+            wheelY: 'none',
+            paddingBottom: 20,
+            paddingTop: 20,
+            paddingLeft: 20,
+            paddingRight: 20,
+            // zoomStep:1,
+            // homeRotationX:0,
+            // homeRotationY:0,
+            // homeZoomLevel:1,
+            // homeGeoPoint:{longitude:0,latitude: 0},
+            projection: am5map.geoEqualEarth()
+        }));
+        // Create polygon series
+        var polygonSeries = chart.series.push(am5map.MapPolygonSeries.new(root, {
+            geoJSON: am5geodata_worldLow,
+            geodataNames: am5geodata_lang_cn_ZH
+
+        }));
+        polygonSeries.mapPolygons.template.setAll({
+            tooltipText: '{name}',
+            toggleKey: 'active',
+            interactive: true
+        });
+        polygonSeries.mapPolygons.template.states.create('hover', {
+            fill: root.interfaceColors.get('primaryButtonHover')
+        });
+        polygonSeries.mapPolygons.template.states.create('active', {
+            fill: root.interfaceColors.get('primaryButtonHover')
+        });
+        var graticuleSeries = chart.series.insertIndex(0, am5map.GraticuleSeries.new(root, { step: 15 }));
+        graticuleSeries.mapLines.template.setAll({
+            stroke: am5.color(0x000000),
+            strokeOpacity: 0.1
+        });
+        // === 特别高亮 0° 经线（本初子午线，伦敦格林威治那条）===
+        // var primeMeridianSeries = chart.series.push(am5map.GraticuleSeries.new(root, {
+        // 	step: 360, // 只会画一条
+        // 	longitude: 0 // 强制画在 0° 经度
+        // }));
+        // primeMeridianSeries.mapLines.template.setAll({
+        // 	stroke: am5.color('#ffcd00'), // 金色，和中国高亮同色
+        // 	strokeWidth: 1,
+        // 	strokeOpacity: 0.9
+        // });
+        var backgroundSeries = chart.series.unshift(am5map.MapPolygonSeries.new(root, {}));
+        backgroundSeries.mapPolygons.template.setAll({
+            fill: am5.color(0xedf7fa),
+            stroke: am5.color(0xedf7fa),
+        });
+        backgroundSeries.data.push({
+            geometry: am5map.getGeoRectangle(90, 180, -90, -180)
+        });
+
+        // 设置导出图像
+        var exporting = am5plugins_exporting.Exporting.new(root, {
+            menu: am5plugins_exporting.ExportingMenu.new(root, {})
+        });
+        //导出图像时暂时修改图像尺寸；导出后恢复
+        exporting.events.on('exportstarted', function () {
+            root.dom.style.width = '600px';
+            root.dom.style.height = '600px';
+            root.resize();
+        });
+        exporting.events.on('exportfinished', function () {
+            root.dom.style.width = '';
+            root.dom.style.height = '';
+            root.resize();
+        });
+
+    }); // end am5.ready()
+</script>
